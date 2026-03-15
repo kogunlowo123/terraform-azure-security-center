@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture -- terraform-azure-security-center</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b0c0b;color:#f5f2eb;font-family:'SF Mono','Cascadia Code','Fira Code',monospace;line-height:1.7;padding:0}
+a{color:#c8420a;text-decoration:none}a:hover{text-decoration:underline}
+.container{max-width:1200px;margin:0 auto;padding:2rem}
+h1,h2,h3{color:#f5f2eb;margin-bottom:1rem}
+h1{font-size:2rem;border-bottom:3px solid #c8420a;padding-bottom:.5rem;margin-bottom:2rem}
+h2{font-size:1.4rem;border-bottom:1px solid #333;padding-bottom:.4rem;margin-top:2.5rem}
+h3{font-size:1.1rem;color:#c8420a}
+.badge{display:inline-block;background:#0078d4;color:#fff;padding:4px 14px;border-radius:4px;font-size:.75rem;font-weight:700;margin-right:8px;letter-spacing:.5px}
+.badge-accent{background:#c8420a}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin:1.5rem 0}
+.card{background:#161816;border:1px solid #222;border-radius:8px;padding:1.2rem}
+.card h3{margin-bottom:.5rem;font-size:.95rem}
+.card p{font-size:.82rem;color:#bbb}
+.card .num{font-size:1.8rem;color:#c8420a;font-weight:700}
+.arch-diagram{background:#121312;border:1px solid #333;border-radius:8px;padding:2rem;margin:1.5rem 0;overflow-x:auto}
+.box{background:#1a1b1a;border:2px solid #c8420a;border-radius:6px;padding:.7rem 1.2rem;text-align:center;font-size:.8rem;min-width:110px;display:inline-block}
+.box.blue{border-color:#0078d4;color:#7ec8f0}
+.box.green{border-color:#3f8624;color:#7fba00}
+.box.red{border-color:#dd344c;color:#ff6b7a}
+.box.purple{border-color:#8c4fff;color:#b4a0ff}
+.box.orange{border-color:#ff9900;color:#ffb84d}
+.arrow{color:#555;font-size:1.2rem}
+.table-wrap{overflow-x:auto;margin:1rem 0}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{background:#1a1b1a;color:#c8420a;text-align:left;padding:.6rem .8rem;border-bottom:2px solid #333}
+td{padding:.5rem .8rem;border-bottom:1px solid #1e1f1e}
+tr:hover td{background:#161816}
+.checklist{list-style:none;padding:0}
+.checklist li{padding:.4rem 0;font-size:.85rem}
+.checklist li::before{content:"[ ] ";color:#c8420a;font-weight:700}
+.checklist li.done::before{content:"[x] ";color:#3f8624}
+code{background:#1a1b1a;padding:2px 6px;border-radius:3px;font-size:.82rem}
+pre{background:#121312;border:1px solid #333;border-radius:6px;padding:1rem;overflow-x:auto;font-size:.8rem;margin:1rem 0}
+.section{margin:2rem 0}
+.footer{border-top:1px solid #333;padding-top:1.5rem;margin-top:3rem;text-align:center;font-size:.75rem;color:#666}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:768px){.grid-2{grid-template-columns:1fr}}
+.flow-row{display:flex;align-items:center;justify-content:center;gap:.4rem;margin:.5rem 0;flex-wrap:wrap}
+.flow-col{display:flex;flex-direction:column;align-items:center;gap:.4rem}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div style="margin-bottom:1rem">
+<span class="badge">Microsoft Azure</span>
+<span class="badge badge-accent">Terraform Module</span>
+<span class="badge" style="background:#333">Security</span>
+</div>
+
+<h1>terraform-azure-security-center</h1>
+
+<div class="section">
+<h2>Executive Summary</h2>
+<p>Production-ready Terraform module for deploying Microsoft Defender for Cloud at subscription level with security contacts, per-resource Defender plans (VMs, App Services, SQL, Storage, Key Vault, Containers, Cosmos DB, ARM, DNS, Cloud Posture), auto-provisioning of the Log Analytics agent, MCAS and Defender for Endpoint integrations, Sentinel onboarding, custom security assessment policies, and automated security workflow triggers via Logic Apps.</p>
+</div>
+
+<div class="section">
+<h2>Overview</h2>
+<div class="cards">
+<div class="card"><div class="num">7</div><h3>Resource Types</h3><p>Contacts, Plans, Settings, Assessments, Automations, Workspace</p></div>
+<div class="card"><div class="num">16</div><h3>Variables</h3><p>Configurable input parameters</p></div>
+<div class="card"><div class="num">12</div><h3>Outputs</h3><p>IDs, states, integration status</p></div>
+<div class="card"><div class="num">3</div><h3>Examples</h3><p>Basic, Advanced, Complete</p></div>
+</div>
+</div>
+
+<div class="section">
+<h2>Architecture Diagram</h2>
+<div class="arch-diagram">
+<div class="flow-col">
+<div class="flow-row">
+<div class="box blue" style="min-width:250px">Microsoft Defender for Cloud<br><small>Subscription Level</small></div>
+</div>
+<div class="arrow" style="display:block;text-align:center">|</div>
+<div class="flow-row">
+<div style="border:2px solid #dd344c;border-radius:8px;padding:1rem;margin:.3rem">
+<div style="color:#ff6b7a;font-weight:700;text-align:center;margin-bottom:.5rem">Defender Plans (Standard Tier)</div>
+<div class="flow-row">
+<div class="box red">VMs</div>
+<div class="box red">App Services</div>
+<div class="box red">SQL Servers</div>
+<div class="box red">Storage</div>
+</div>
+<div class="flow-row">
+<div class="box red">Key Vaults</div>
+<div class="box red">Containers</div>
+<div class="box red">ARM / DNS</div>
+<div class="box red">CSPM</div>
+</div>
+</div>
+</div>
+<div class="flow-row">
+<div style="border:2px solid #8c4fff;border-radius:8px;padding:1rem;margin:.3rem">
+<div style="color:#b4a0ff;font-weight:700;text-align:center;margin-bottom:.5rem">Integrations</div>
+<div class="flow-row">
+<div class="box purple">MCAS<br><small>Cloud App Security</small></div>
+<div class="box purple">WDATP / MDE<br><small>Defender for Endpoint</small></div>
+<div class="box purple">Sentinel<br><small>Onboarding</small></div>
+</div>
+</div>
+</div>
+<div class="flow-row">
+<div style="border:2px solid #3f8624;border-radius:8px;padding:1rem;margin:.3rem">
+<div style="color:#7fba00;font-weight:700;text-align:center;margin-bottom:.5rem">Provisioning &amp; Workspace</div>
+<div class="flow-row">
+<div class="box green">Auto-Provisioning<br><small>Log Analytics Agent</small></div>
+<div class="box green">Vulnerability<br>Assessment</div>
+<div class="box green">Log Analytics<br>Workspace</div>
+</div>
+</div>
+</div>
+<div class="flow-row">
+<div style="border:2px solid #ff9900;border-radius:8px;padding:1rem;margin:.3rem">
+<div style="color:#ffb84d;font-weight:700;text-align:center;margin-bottom:.5rem">Assessments &amp; Automations</div>
+<div class="flow-row">
+<div class="box orange">Custom Assessments<br><small>Encryption / MFA / Logging</small></div>
+<div class="box orange">Security Automations<br><small>High Severity Alerts</small></div>
+<div class="box orange">Logic App<br>Workflows</div>
+</div>
+</div>
+</div>
+<div class="flow-row" style="margin-top:1rem">
+<div class="box blue">Security Contact<br><small>Email + Phone + Admin Alerts</small></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="section">
+<h2>Component Breakdown</h2>
+<div class="table-wrap">
+<table>
+<tr><th>Resource</th><th>Purpose</th></tr>
+<tr><td><code>azurerm_security_center_contact</code></td><td>Security contact with email, phone, and admin alert notifications</td></tr>
+<tr><td><code>azurerm_security_center_subscription_pricing</code></td><td>Per-resource-type Defender plan activation (Free/Standard with subplans)</td></tr>
+<tr><td><code>azurerm_security_center_auto_provisioning</code></td><td>Automatic Log Analytics agent deployment to VMs</td></tr>
+<tr><td><code>azurerm_security_center_workspace</code></td><td>Log Analytics workspace assignment for security data</td></tr>
+<tr><td><code>azurerm_security_center_setting</code></td><td>MCAS, WDATP, and Sentinel integration toggles</td></tr>
+<tr><td><code>azurerm_security_center_assessment_policy</code></td><td>Custom security assessments with severity and threat mapping</td></tr>
+<tr><td><code>azurerm_security_center_automation</code></td><td>Automated workflows triggered by alerts/compliance changes</td></tr>
+</table>
+</div>
+</div>
+
+<div class="section">
+<h2>Data Flow</h2>
+<div class="arch-diagram">
+<div class="flow-row">
+<div class="box blue">Azure Resources</div>
+<div class="arrow">&rarr;</div>
+<div class="box red">Defender Plans<br><small>Threat Detection</small></div>
+<div class="arrow">&rarr;</div>
+<div class="box orange">Security Alerts</div>
+<div class="arrow">&rarr;</div>
+<div class="box green">Automations<br><small>Logic App</small></div>
+<div class="arrow">&rarr;</div>
+<div class="box purple">Security Contact<br><small>Email + SMS</small></div>
+</div>
+</div>
+<p style="font-size:.85rem;color:#bbb;margin-top:.5rem"><strong>1.</strong> Defender plans monitor Azure resources at the subscription level. <strong>2.</strong> Threat detection generates security alerts and recommendations. <strong>3.</strong> Custom assessments evaluate compliance posture. <strong>4.</strong> Security automations trigger Logic App workflows for high-severity alerts. <strong>5.</strong> Security contacts receive notifications. <strong>6.</strong> All data flows to Log Analytics and optionally to Sentinel for SIEM.</p>
+</div>
+
+<div class="section">
+<h2>Security Controls</h2>
+<div class="grid-2">
+<div class="card">
+<h3>Threat Protection</h3>
+<p>- Per-resource Defender plans (14 resource types)<br>- Standard tier for advanced threat detection<br>- Subplan support (P1/P2 for VMs)<br>- Vulnerability assessment auto-provisioning</p>
+</div>
+<div class="card">
+<h3>Integration</h3>
+<p>- MCAS for shadow IT discovery<br>- Defender for Endpoint (WDATP/MDE)<br>- Sentinel onboarding for SIEM<br>- Log Analytics workspace assignment</p>
+</div>
+<div class="card">
+<h3>Compliance</h3>
+<p>- Custom security assessment policies<br>- Severity classification (High/Medium/Low)<br>- Threat categorization<br>- Implementation effort tracking</p>
+</div>
+<div class="card">
+<h3>Incident Response</h3>
+<p>- Security contact notifications<br>- Admin alert forwarding<br>- Automated workflows via Logic Apps<br>- Event source filtering (alerts, compliance)</p>
+</div>
+</div>
+</div>
+
+<div class="section">
+<h2>Industry Adaptation</h2>
+<div class="cards">
+<div class="card"><h3>Enterprise</h3><p>All Defender plans at Standard tier, MCAS + MDE integration, Sentinel for centralized SIEM, automated incident response</p></div>
+<div class="card"><h3>Financial Services</h3><p>SQL Server and Storage Defender plans, custom assessments for encryption and MFA, compliance automation workflows</p></div>
+<div class="card"><h3>Healthcare</h3><p>VM vulnerability assessment, Key Vault protection, custom logging assessments, auto-provisioning for all servers</p></div>
+<div class="card"><h3>Government</h3><p>Cloud Posture Management (CSPM), ARM/DNS protection, full Sentinel integration, custom security assessment policies</p></div>
+</div>
+</div>
+
+<div class="section">
+<h2>Production Readiness Checklist</h2>
+<ul class="checklist">
+<li class="done">Security contact configured with email and admin alerts</li>
+<li class="done">Defender plans enabled for all critical resource types</li>
+<li class="done">Auto-provisioning of Log Analytics agent enabled</li>
+<li class="done">MCAS and MDE integrations activated</li>
+<li class="done">Log Analytics workspace assigned</li>
+<li>Enable Sentinel onboarding for SIEM correlation</li>
+<li>Create custom security assessments for org policies</li>
+<li>Set up security automations for high-severity alerts</li>
+<li>Enable vulnerability assessment auto-provisioning</li>
+<li>Review and tune Defender plan subplans (P1/P2)</li>
+<li>Configure Logic App workflows for incident response</li>
+</ul>
+</div>
+
+<div class="section">
+<h2>Configuration Reference</h2>
+<div class="table-wrap">
+<table>
+<tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td><code>security_contact_email</code></td><td>string</td><td>--</td><td>Security contact email (required)</td></tr>
+<tr><td><code>security_contact_phone</code></td><td>string</td><td>null</td><td>Security contact phone</td></tr>
+<tr><td><code>defender_plans</code></td><td>map(object)</td><td>{}</td><td>Per-resource Defender plans (Free/Standard)</td></tr>
+<tr><td><code>auto_provisioning_enabled</code></td><td>bool</td><td>true</td><td>Auto-provision Log Analytics agent</td></tr>
+<tr><td><code>log_analytics_workspace_id</code></td><td>string</td><td>null</td><td>Workspace for security data</td></tr>
+<tr><td><code>setting_mcas_enabled</code></td><td>bool</td><td>true</td><td>Enable MCAS integration</td></tr>
+<tr><td><code>setting_wdatp_enabled</code></td><td>bool</td><td>true</td><td>Enable MDE integration</td></tr>
+<tr><td><code>setting_sentinel_onboarding_enabled</code></td><td>bool</td><td>false</td><td>Enable Sentinel</td></tr>
+<tr><td><code>security_assessments</code></td><td>map(object)</td><td>{}</td><td>Custom assessment policies</td></tr>
+<tr><td><code>security_automations</code></td><td>map(object)</td><td>{}</td><td>Workflow automations</td></tr>
+</table>
+</div>
+</div>
+
+<div class="section">
+<h2>Deployment</h2>
+<pre>
+terraform init
+terraform plan -var-file="security.tfvars"
+terraform apply -var-file="security.tfvars"
+
+# Verify Defender status
+az security pricing list --query "[].{name:name, tier:pricingTier}"
+az security contact list
+</pre>
+</div>
+
+<div class="section">
+<h2>Links</h2>
+<p>
+<a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/">Microsoft Defender for Cloud Docs</a> |
+<a href="https://learn.microsoft.com/en-us/azure/sentinel/">Microsoft Sentinel</a> |
+<a href="../examples/basic/main.tf">Basic Example</a> |
+<a href="../examples/complete/main.tf">Complete Example</a>
+</p>
+</div>
+
+<div class="footer">
+<p>terraform-azure-security-center &mdash; Architecture Document</p>
+<p>Generated on 2026-03-15 &bull; Terraform &ge; 1.5.0 &bull; AzureRM &ge; 3.80.0</p>
+<p style="margin-top:.5rem"><span class="badge">Microsoft Azure</span> Verified Module Architecture</p>
+</div>
+
+</div>
+</body>
+</html>
