@@ -1,6 +1,5 @@
-###############################################################################
-# Security Contact
-###############################################################################
+data "azurerm_subscription" "current" {}
+
 resource "azurerm_security_center_contact" "this" {
   email               = var.security_contact_email
   phone               = var.security_contact_phone
@@ -8,9 +7,6 @@ resource "azurerm_security_center_contact" "this" {
   alerts_to_admins    = var.security_contact_alerts_to_admins
 }
 
-###############################################################################
-# Defender Plans (Pricing Tiers)
-###############################################################################
 resource "azurerm_security_center_subscription_pricing" "this" {
   for_each = var.defender_plans
 
@@ -19,35 +15,23 @@ resource "azurerm_security_center_subscription_pricing" "this" {
   subplan       = each.value.subplan
 }
 
-###############################################################################
-# Auto Provisioning
-###############################################################################
 resource "azurerm_security_center_auto_provisioning" "this" {
-  auto_provision = local.auto_provisioning_state
+  auto_provision = var.auto_provisioning_enabled ? "On" : "Off"
 }
 
-###############################################################################
-# Workspace Assignment
-###############################################################################
 resource "azurerm_security_center_workspace" "this" {
   count = var.log_analytics_workspace_id != null ? 1 : 0
 
-  scope        = local.workspace_scope
+  scope        = var.workspace_scope != null ? var.workspace_scope : data.azurerm_subscription.current.id
   workspace_id = var.log_analytics_workspace_id
 }
 
-###############################################################################
-# Server Vulnerability Assessment Auto Provisioning
-###############################################################################
 resource "azurerm_security_center_server_vulnerability_assessment_virtual_machine" "this" {
   count = var.enable_server_vulnerability_assessment ? 1 : 0
 
-  virtual_machine_id = "" # This is managed at subscription level via azurerm_security_center_server_vulnerability_assessments_setting
+  virtual_machine_id = ""
 }
 
-###############################################################################
-# Integration Settings (MCAS, WDATP)
-###############################################################################
 resource "azurerm_security_center_setting" "mcas" {
   setting_name = "MCAS"
   enabled      = var.setting_mcas_enabled
@@ -65,9 +49,6 @@ resource "azurerm_security_center_setting" "sentinel" {
   enabled      = var.setting_sentinel_onboarding_enabled
 }
 
-###############################################################################
-# Custom Security Assessments
-###############################################################################
 resource "azurerm_security_center_assessment_policy" "this" {
   for_each = var.security_assessments
 
@@ -80,9 +61,6 @@ resource "azurerm_security_center_assessment_policy" "this" {
   threats               = each.value.threats
 }
 
-###############################################################################
-# Security Automations
-###############################################################################
 resource "azurerm_security_center_automation" "this" {
   for_each = var.security_automations
 
@@ -124,5 +102,5 @@ resource "azurerm_security_center_automation" "this" {
     }
   }
 
-  tags = merge(local.common_tags, each.value.tags)
+  tags = merge(var.tags, each.value.tags)
 }

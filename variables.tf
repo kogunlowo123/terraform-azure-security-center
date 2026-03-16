@@ -9,7 +9,7 @@ variable "security_contact_email" {
 }
 
 variable "security_contact_phone" {
-  description = "Phone number for security contact. Optional."
+  description = "Phone number for security contact (optional)."
   type        = string
   default     = null
 }
@@ -26,9 +26,6 @@ variable "security_contact_alerts_to_admins" {
   default     = true
 }
 
-###############################################################################
-# Defender Plans (Pricing Tiers)
-###############################################################################
 variable "defender_plans" {
   description = "Map of Microsoft Defender for Cloud pricing tiers per resource type."
   type = map(object({
@@ -59,18 +56,12 @@ variable "defender_plans" {
   }
 }
 
-###############################################################################
-# Auto Provisioning
-###############################################################################
 variable "auto_provisioning_enabled" {
   description = "Whether auto-provisioning of the Log Analytics agent is enabled."
   type        = bool
   default     = true
 }
 
-###############################################################################
-# Log Analytics Workspace
-###############################################################################
 variable "log_analytics_workspace_id" {
   description = "Resource ID of the Log Analytics workspace for Security Center data."
   type        = string
@@ -78,14 +69,11 @@ variable "log_analytics_workspace_id" {
 }
 
 variable "workspace_scope" {
-  description = "Scope for the workspace assignment. Defaults to subscription."
+  description = "Scope for the workspace assignment (defaults to current subscription)."
   type        = string
   default     = null
 }
 
-###############################################################################
-# Server Vulnerability Assessment
-###############################################################################
 variable "enable_server_vulnerability_assessment" {
   description = "Whether to enable server vulnerability assessment auto-provisioning."
   type        = bool
@@ -93,7 +81,7 @@ variable "enable_server_vulnerability_assessment" {
 }
 
 variable "server_vulnerability_assessment_provider" {
-  description = "Vulnerability assessment provider: 'mdeTvm' (Defender) or 'qualys'."
+  description = "Vulnerability assessment provider: mdeTvm (Defender) or qualys."
   type        = string
   default     = "mdeTvm"
 
@@ -103,19 +91,16 @@ variable "server_vulnerability_assessment_provider" {
   }
 }
 
-###############################################################################
-# Security Assessments / Regulatory Compliance
-###############################################################################
 variable "security_assessments" {
-  description = "Map of custom security assessment metadata."
+  description = "Map of custom security assessment policies to create."
   type = map(object({
-    display_name  = string
-    description   = string
-    severity      = optional(string, "Medium")
-    categories    = optional(list(string), ["Compute"])
+    display_name          = string
+    description           = string
+    severity              = optional(string, "Medium")
+    categories            = optional(list(string), ["Compute"])
     implementation_effort = optional(string, "Moderate")
-    user_impact   = optional(string, "Moderate")
-    threats       = optional(list(string), [])
+    user_impact           = optional(string, "Moderate")
+    threats               = optional(list(string), [])
   }))
   default = {}
 
@@ -127,9 +112,6 @@ variable "security_assessments" {
   }
 }
 
-###############################################################################
-# Automation (Security Center Automation)
-###############################################################################
 variable "security_automations" {
   description = "Map of Security Center automations for workflow triggers."
   type = map(object({
@@ -162,9 +144,6 @@ variable "security_automations" {
   default = {}
 }
 
-###############################################################################
-# Subscription-level Settings
-###############################################################################
 variable "setting_mcas_enabled" {
   description = "Whether to enable Microsoft Cloud App Security (MCAS) integration."
   type        = bool
